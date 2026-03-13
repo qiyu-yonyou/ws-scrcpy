@@ -225,3 +225,4 @@ Currently, support of WebSocket protocol added to v1.19 of scrcpy
 [webgl]: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
 [workers]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API
 [webcodecs]: https://w3c.github.io/webcodecs/
+# ws-scrcpy
