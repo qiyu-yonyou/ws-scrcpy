@@ -1,0 +1,11 @@
+node_modules
+dist
+.cache
+.DS_Store
+
+# local clones used for investigation
+_scrcpy_upstream
+_ref_ws-scrcpy
+
+# local build artifacts
+_local_jdk

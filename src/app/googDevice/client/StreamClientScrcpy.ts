@@ -30,6 +30,7 @@ import { ACTION } from '../../../common/Action';
 import { StreamReceiverScrcpy } from './StreamReceiverScrcpy';
 import { ParamsDeviceTracker } from '../../../types/ParamsDeviceTracker';
 import { ScrcpyFilePushStream } from '../filePush/ScrcpyFilePushStream';
+import { PcmAudioPlayer } from '../../audio/PcmAudioPlayer';
 
 type StartParams = {
     udid: string;
@@ -60,6 +61,8 @@ export class StreamClientScrcpy
     private filePushHandler?: FilePushHandler;
     private fitToScreen?: boolean;
     private readonly streamReceiver: StreamReceiverScrcpy;
+    private audioPlayer = new PcmAudioPlayer();
+    private soundEnabled = false;
 
     public static registerPlayer(playerClass: PlayerClass): void {
         if (playerClass.isSupported()) {
@@ -186,6 +189,18 @@ export class StreamClientScrcpy
         this.setTitle(`Stream ${this.deviceName}`);
     };
 
+    public onAudio = (payload: ArrayBuffer): void => {
+        if (!this.soundEnabled) {
+            return;
+        }
+        this.audioPlayer.pushPacket(payload);
+    };
+
+    public setSoundEnabled(enabled: boolean): void {
+        this.soundEnabled = enabled;
+        this.audioPlayer.setEnabled(enabled);
+    }
+
     public onDisplayInfo = (infoArray: DisplayCombinedInfo[]): void => {
         if (!this.player) {
             return;
@@ -251,6 +266,7 @@ export class StreamClientScrcpy
     public onDisconnected = (): void => {
         this.streamReceiver.off('deviceMessage', this.OnDeviceMessage);
         this.streamReceiver.off('video', this.onVideo);
+        this.streamReceiver.off('audio', this.onAudio);
         this.streamReceiver.off('clientsStats', this.onClientsStats);
         this.streamReceiver.off('displayInfo', this.onDisplayInfo);
         this.streamReceiver.off('disconnected', this.onDisconnected);
@@ -259,6 +275,7 @@ export class StreamClientScrcpy
         this.filePushHandler = undefined;
         this.touchHandler?.release();
         this.touchHandler = undefined;
+        this.audioPlayer.setEnabled(false);
     };
 
     public startStream({ udid, player, playerName, videoSettings, fitToScreen }: StartParams): void {
@@ -341,6 +358,7 @@ export class StreamClientScrcpy
         const streamReceiver = this.streamReceiver;
         streamReceiver.on('deviceMessage', this.OnDeviceMessage);
         streamReceiver.on('video', this.onVideo);
+        streamReceiver.on('audio', this.onAudio);
         streamReceiver.on('clientsStats', this.onClientsStats);
         streamReceiver.on('displayInfo', this.onDisplayInfo);
         streamReceiver.on('disconnected', this.onDisconnected);

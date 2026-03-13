@@ -1,0 +1,34 @@
+# 在 GitHub 上点「运行」后，约 5～10 分钟可在本页下载 ws-scrcpy 基础镜像 tar，无需本机装 Docker/Skopeo
+name: 生成 ws-scrcpy 基础镜像 tar
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'NAS 架构（选你 NAS 对应的）'
+        required: true
+        default: 'arm64'
+        type: choice
+        options:
+          - arm64
+          - amd64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取并打包基础镜像
+        run: |
+          docker pull --platform linux/${{ github.event.inputs.platform }} debian:bookworm-slim
+          docker pull --platform linux/${{ github.event.inputs.platform }} node:20-bookworm
+          docker pull --platform linux/${{ github.event.inputs.platform }} node:20-bookworm-slim
+          docker save -o ws-scrcpy-base-images.tar \
+            debian:bookworm-slim \
+            node:20-bookworm \
+            node:20-bookworm-slim
+
+      - name: 上传供下载
+        uses: actions/upload-artifact@v4
+        with:
+          name: ws-scrcpy-base-${{ github.event.inputs.platform }}
+          path: ws-scrcpy-base-images.tar

@@ -9,6 +9,7 @@ import { ParamsStream } from '../../types/ParamsStream';
 
 const DEVICE_NAME_FIELD_LENGTH = 64;
 const MAGIC_BYTES_INITIAL = Util.stringToUtf8ByteArray('scrcpy_initial');
+const MAGIC_BYTES_AUDIO = Util.stringToUtf8ByteArray('scrcpy_audio_');
 
 export type ClientsStats = {
     deviceName: string;
@@ -24,6 +25,7 @@ export type DisplayCombinedInfo = {
 
 interface StreamReceiverEvents {
     video: ArrayBuffer;
+    audio: ArrayBuffer;
     deviceMessage: DeviceMessage;
     displayInfo: DisplayCombinedInfo[];
     clientsStats: ClientsStats;
@@ -141,6 +143,11 @@ export class StreamReceiver<P extends ParamsStream> extends ManagerClient<Params
                 if (StreamReceiver.EqualArrays(magicBytes, DeviceMessage.MAGIC_BYTES_MESSAGE)) {
                     const message = DeviceMessage.fromBuffer(event.data);
                     this.emit('deviceMessage', message);
+                    return;
+                }
+                if (StreamReceiver.EqualArrays(magicBytes, MAGIC_BYTES_AUDIO)) {
+                    const audioPayload = event.data.slice(MAGIC_BYTES_AUDIO.length);
+                    this.emit('audio', audioPayload);
                     return;
                 }
             }

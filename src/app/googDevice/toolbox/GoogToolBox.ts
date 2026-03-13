@@ -93,6 +93,13 @@ export class GoogToolBox extends ToolBox {
         });
         elements.push(keyboard);
 
+        const sound = new ToolBoxCheckbox('Sound', SvgImage.Icon.VOLUME_UP, `sound_${udid}_${playerName}`);
+        sound.addEventListener('click', (_, el) => {
+            const element = el.getElement();
+            client.setSoundEnabled(element.checked);
+        });
+        elements.push(sound);
+
         if (moreBox) {
             const displayId = player.getVideoSettings().displayId;
             const id = `show_more_${udid}_${playerName}_${displayId}`;

@@ -1,0 +1,20 @@
+services:
+  ws-scrcpy:
+    build:
+      context: .
+      platforms:
+        - linux/arm64
+    platform: linux/arm64
+    container_name: ws-scrcpy
+    ports:
+      - "8000:8000"
+    environment:
+      - WS_SCRCPY_CONFIG=/app/config.yaml
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    # If you plan to use USB-connected devices via adb inside container,
+    # you may need one of these options depending on NAS:
+    # privileged: true
+    # devices:
+    #   - /dev/bus/usb:/dev/bus/usb
+    restart: unless-stopped
