@@ -1,5 +1,5 @@
 # 运行后从 Artifacts 下载 apk，改名为 scrcpy-server.jar 放到 vendor/Genymobile/scrcpy/
-# 触发方式：① 网页点 Run workflow（若有） ② 推送本 workflow 文件或推送含 trigger-scrcpy-server-build 的提交
+# 触发：推送本文件或推送含 trigger-scrcpy-server-build 的提交
 name: 构建带音频的 scrcpy-server
 
 on:
@@ -16,14 +16,20 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: 确认使用当前 workflow（apt 安装 Gradle，无 gradle action）
-        run: |
-          echo "Workflow 版本 apt-gradle-$(date +%Y%m%d)"
-
-      - name: 检出仓库（含子模块 _scrcpy_fork）
+      - name: 检出主仓库（不拉取子模块，避免子模块报错）
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+
+      - name: 拉取可构建的 scrcpy 源码到 _scrcpy_fork
+        run: |
+          set -e
+          rm -rf _scrcpy_fork
+          git clone --depth 1 https://github.com/NetrisTV/scrcpy.git _scrcpy_fork
+          if [ ! -f _scrcpy_fork/server/build.gradle ]; then
+            echo "::error::_scrcpy_fork/server 不存在 build.gradle"
+            exit 1
+          fi
 
       - name: 设置 Java 17
         uses: actions/setup-java@v4
@@ -40,19 +46,20 @@ jobs:
             platforms;android-33
             build-tools;33.0.2
 
-      - name: 安装 Gradle（系统包，避免缓存/下载失败）
-        run: sudo apt-get update && sudo apt-get install -y gradle
-
-      - name: 构建 scrcpy server (Release APK)
+      - name: 安装 Gradle 并构建
         run: |
+          set -e
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gradle
           cd _scrcpy_fork/server
-          gradle assembleRelease --no-daemon
+          gradle assembleRelease --no-daemon --stacktrace
 
-      - name: 打包并上传 Artifact
+      - name: 打包并上传
         run: |
+          set -e
           cp _scrcpy_fork/server/build/outputs/apk/release/server-release.apk scrcpy-server-with-audio.apk
 
-      - name: 上传供下载
+      - name: 上传 Artifact
         uses: actions/upload-artifact@v4
         with:
           name: scrcpy-server-with-audio
