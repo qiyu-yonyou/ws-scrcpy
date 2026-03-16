@@ -27,8 +27,18 @@ jobs:
             node:20-bookworm \
             node:20-bookworm-slim
 
-      - name: 上传供下载
+      - name: 上传供下载（Artifacts）
         uses: actions/upload-artifact@v4
         with:
           name: ws-scrcpy-base-${{ github.event.inputs.platform }}
           path: ws-scrcpy-base-images.tar
+
+      - name: 创建 Release 并提供直接下载链接
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: base-${{ github.event.inputs.platform }}-${{ github.run_id }}
+          name: 基础镜像 tar (NAS ${{ github.event.inputs.platform }})
+          files: ws-scrcpy-base-images.tar
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

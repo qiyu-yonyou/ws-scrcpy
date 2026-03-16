@@ -16,7 +16,6 @@ export class PcmAudioPlayer {
     private processor?: ScriptProcessorNode;
     private format?: AudioFormat;
     private queue: Float32Array[] = [];
-    private queuedFrames = 0;
     private started = false;
 
     public setEnabled(enabled: boolean): void {
@@ -67,8 +66,6 @@ export class PcmAudioPlayer {
         }
         const float = this.int16leToFloat32(pcmBytes);
         this.queue.push(float);
-        const channels = this.format.channels;
-        this.queuedFrames += float.length / channels;
     }
 
     private ensureStarted(): void {
@@ -151,7 +148,6 @@ export class PcmAudioPlayer {
             }
 
             frameOffset += framesToCopy;
-            this.queuedFrames -= framesToCopy;
         }
     }
 
@@ -168,7 +164,6 @@ export class PcmAudioPlayer {
 
     private stop(): void {
         this.queue.length = 0;
-        this.queuedFrames = 0;
         this.started = false;
         if (this.processor) {
             try {

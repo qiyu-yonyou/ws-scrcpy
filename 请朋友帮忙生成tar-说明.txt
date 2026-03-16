@@ -1,0 +1,30 @@
+========================================
+  请转发给「能运行 Docker 的朋友」或「有一台装了 Docker 的电脑的人」
+========================================
+
+请帮我在你电脑上生成一个文件，我拷到 NAS 上就能用。你电脑需要已安装 Docker（不用装别的）。
+
+【步骤 1】打开终端（Windows 用 CMD 或 PowerShell，Mac 用「终端」）。
+
+【步骤 2】先问我要「arm64」还是「amd64」：
+  - 我 NAS 是 arm 架构（多数群晖/威联通/铁威马）→ 用 arm64
+  - 我 NAS 是 Intel/AMD → 用 amd64
+
+【步骤 3】把你选的平台代入下面命令（二选一，整段复制到终端执行）。
+
+--- 若选的是 arm64，执行这段 ---
+docker pull --platform linux/arm64 debian:bookworm-slim
+docker pull --platform linux/arm64 node:20-bookworm
+docker pull --platform linux/arm64 node:20-bookworm-slim
+docker save -o ws-scrcpy-base-images.tar debian:bookworm-slim node:20-bookworm node:20-bookworm-slim
+
+--- 若选的是 amd64，执行这段 ---
+docker pull --platform linux/amd64 debian:bookworm-slim
+docker pull --platform linux/amd64 node:20-bookworm
+docker pull --platform linux/amd64 node:20-bookworm-slim
+docker save -o ws-scrcpy-base-images.tar debian:bookworm-slim node:20-bookworm node:20-bookworm-slim
+
+【步骤 4】执行完后，在当前终端所在目录下会多一个文件：ws-scrcpy-base-images.tar（几百 MB）。  
+请把这个文件发给我（U 盘、网盘、微信文件等都可以）。
+
+谢谢！
