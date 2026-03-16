@@ -1,5 +1,5 @@
 # 在 GitHub 上手动运行后，可从本页 Artifacts 下载「带音频的 scrcpy-server」。
-# 无需本机安装 Android 环境，下载得到的 apk 改名为 scrcpy-server.jar 放到 vendor/Genymobile/scrcpy/ 即可。
+# 下载的 apk 改名为 scrcpy-server.jar 放到 vendor/Genymobile/scrcpy/ 即可。
 name: 构建带音频的 scrcpy-server
 
 on:
@@ -29,20 +29,23 @@ jobs:
             tools
             platform-tools
             platforms;android-33
-            build-tools;34.0.0
+            build-tools;33.0.2
+
+      - name: 配置 Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: "7.5"
 
       - name: 构建 scrcpy server (Release APK)
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: 7.5
-          working-directory: _scrcpy_fork/server
-          build-arguments: assembleRelease --no-daemon
+        run: |
+          cd _scrcpy_fork/server
+          gradle assembleRelease --no-daemon
 
-      - name: 打包为 scrcpy-server 并上传
+      - name: 打包并上传 Artifact
         run: |
           cp _scrcpy_fork/server/build/outputs/apk/release/server-release.apk scrcpy-server-with-audio.apk
 
-      - name: 上传 Artifact 供下载
+      - name: 上传供下载
         uses: actions/upload-artifact@v4
         with:
           name: scrcpy-server-with-audio
