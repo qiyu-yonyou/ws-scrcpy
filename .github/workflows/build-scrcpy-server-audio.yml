@@ -17,7 +17,8 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: 确认使用当前 workflow（apt 安装 Gradle，无 gradle action）
-        run: echo "Workflow 版本: apt-gradle-$(date +%Y%m%d)；无 setup-gradle/无 gradle-build-action"
+        run: |
+          echo "Workflow 版本 apt-gradle-$(date +%Y%m%d)"
 
       - name: 检出仓库（含子模块 _scrcpy_fork）
         uses: actions/checkout@v4
