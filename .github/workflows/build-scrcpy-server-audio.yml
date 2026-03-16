@@ -1,8 +1,14 @@
-# 手动运行后从 Artifacts 下载 apk，改名为 scrcpy-server.jar 放到 vendor/Genymobile/scrcpy/
+# 运行后从 Artifacts 下载 apk，改名为 scrcpy-server.jar 放到 vendor/Genymobile/scrcpy/
+# 触发方式：① 网页点 Run workflow（若有） ② 推送本 workflow 文件或推送含 trigger-scrcpy-server-build 的提交
 name: 构建带音频的 scrcpy-server
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-scrcpy-server-audio.yml'
+      - 'trigger-scrcpy-server-build'
 
 jobs:
   build:
