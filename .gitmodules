@@ -1,0 +1,4 @@
+# 只保留构建带音频 server 需要的子模块；_ref_ws-scrcpy / _scrcpy_upstream 无 url 会报错，需用 git rm 移除
+[submodule "_scrcpy_fork"]
+	path = _scrcpy_fork
+	url = https://github.com/NetrisTV/scrcpy.git
